@@ -61,20 +61,35 @@ module CouchRest
      end
      def self._json
        Yajl
-     end       
+     end
   rescue Exception => e
-     require 'json'
-     class Json
-       def self.parse(str)
-         ::JSON.parse(str)
+     if RUBY_PLATFORM =~ /java/
+       require 'json'
+       class Json
+         def self.parse(str)
+           JSON(str)
+         end
+         def self.encode(hash)
+           JSON(hash)
+         end
        end
-       def self.encode(hash)
-         hash.to_json #::JSON.unparse(hash)
+       def self._json
+         Json
+       end
+     else
+       require 'json'
+       class Json
+         def self.parse(str)
+           ::JSON.parse(str)
+         end
+         def self.encode(hash)
+           hash.to_json #::JSON.unparse(hash)
+         end
+       end
+       def self._json
+         Json
        end
      end
-     def self._json
-       Json
-     end       
   end
 
 
